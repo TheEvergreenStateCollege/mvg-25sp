@@ -1,51 +1,104 @@
-# mvg-25sp
-Multiple View Geometry undergrad research, Spring 2025
+# Software for MVG-25sp
 
+This is a spring undergrad research to understand
+multiple view geometry by writing code, doing calculations,
+and implementing it on our six-legged (hexapod) robot
+for identifying and capturing growing crop plants.
 
-### Computer Vision and Robotics
+## Main Project Areas
 
-Our motivation this spring is to analyze plants growing, specifically from Evergreen's Organic Farm, based on images taken in a repeatable way from six-legged (hexapod) robot traveling close to the ground. We will build and program a shared Freenove Hexapod Robot controlled by a Raspberrry Pi in class.
+We will work on these areas roughly in order,
+earlier areas are pre-requisites to later areas.
 
-Like our robot, we live and move around in a world of three dimensions, yet the sensors we most often connect to computers are two-dimensional: cameras.
+* 1. Calibration Cube
+* 2. Hexapod Robot
+* 3. MATLAB to Octave Code
+* 4. Infrared Positioning
+* 5. Image Segmentation
+* 6. 3D Reconstruction
+* 7. Plant Classification
 
-Reconstructing a 3D object, such as a plant, large building exterior, or even a person from 2D images, uses an area of computer vision called *multiple view geometry* or *projective geometry*, specifically transformations between vector spaces that are usually encoded as matrices or tensors.
+## 1. Calibration Cube
 
-This is an experimental offering where we will be attempting to reproduce several challenging tasks from known research and existing curricula:
-* Making a circuit for one, two, and three infrared "tape measure"s using an IR sensor and transmitter, we will  triangulate our robot's position and its images to geo-locate them on Google Earth
-* Segmenting the foreground of an image (a plant) from the background (the environment) using OpenCV, for two different species
-* Creating a 3D mesh of points from one, two, and three 2D images of the segmented foreground, that can be used to build a "digital twin" viewable on an a website
-* Clustering these 3D mesh of points to build a classifier for distinguishing future plants encountered by our robot.
+Reading the text and working with general mathematical
+camera matrices can sometimes be abstract.
 
-Linear algebra, Python programming, and using circuits with Raspberry Pi single-board computers are helpful, but they can also be learned as we go in this UGR. Just bring your curiosity and enjoyment of staring at math, typing lines of code, and bending wires.
+We will build a physical calibration cube out of wood,
+cardboard, and paper, with OCR text to label points
+for calibration in our projective geometry.
 
-This is a collaborative learning experience where we value helping each other and documenting what we learn to share with the world as an open source project.
-#### Schedule
+For learning 8 camera parameters in a single view as
+described in Hartley Zisserman and the Stanford class notes,
+we only need 8 points to solve for 8 unknowns, and to use
+Singular-Value-Decomposition.
 
-Monday 1-2:30pm LIB 2708 (Physical Computing Center)
-Tuesday 1-2:30pm Lab II 2238 (Physics Lab)
-#### Course Notes:
+## 2. Hexapod Robot
 
-We will be following course notes from [Stanford's CS231a](https://web.stanford.edu/class/cs231a/course_notes.html)
+This is a six-legged robot with a camera that can be used to
+automate image capture and data collection over a large area
+(ideally, all of Evergreen's organic farm or forests), aiding
+and collaborating with human data gathering, and also providing
+more precise geolocating.
 
-and [Daniel Cremers video playlist](https://www.youtube.com/playlist?list=PLTBdjV_4f-EJn6udZ34tht9EVIW7lbeo4) 
+At the beginning, the robot with a camera could be replaced by
+a 3D printer with the hot end / extrusion replaced with a camera.
 
-Our goal will be to construct in Python using the OpenCV, Numpy, Pytorch, and other libraries, the mathematics from this course and the textbook below.
+## 3. MATLAB to Octave Code
 
-#### Textbooks:
+The code from the Hartley and Zisserman textbook comes in MATLAB,
+but this is an expensive package, not available on Evergreen
+computers, does not appear to make use of modern GPU advances,
+and is in general harder-to-learn and inaccessible.
 
-Multiple View Geometry in Computer Vision  
-Second Edition
-Richard Hartley and Andrew Zisserman,  
-Cambridge University Press, March 2004.
-https://www.robots.ox.ac.uk/~vgg/hzbook/
+We propose to convert and test as much of this openly-available
+code on the open source version GNU Octave, as well as 
+freely available Python libraries such as `numpy` and `scipy`.
 
-Implementation of some of the MVG ideas in the Hartley-Zisserman book and some more recent 2012-2013 papers, in C++
-https://github.com/openMVG/openMVG
+## 4. Infrared Positioning 
 
-A circuit for distance measuring with infrared diode + photoresistor using Arduino
-https://www.alanzucconi.com/2015/10/14/how-to-build-a-distance-sensor-with-arduino/
+We will build an IR (infrared) emitter and receive circuit
+using discrete circuit parts following this design.
 
-### Credits:
-Up to 6 upper division computer science awarded in *Computer Vision for Robotics*
+## 5. Image Segmentation (Optional)
 
- Students will be awarded credit for attendance and effort.
+One our robot is able to capture images of a plant,
+most of the image will consist of a background (soil,
+other plants, buildings, etc.). We want to partition
+each image it captures into smaller segments making it easier to  
+run analysis algorithms.
+
+In computer vision, this task is known as *image segmentation*.
+
+This part is optional, as the trend in machine learning work is
+to ingest as much data as possible and train One Model to
+Rule Them All. Meaning if we were to train a classifier,
+we wouldn't want to shield it from negative training examples of
+what is *not* a plant, because image segmentation of
+plant vs. not plant is still a human / hand-labeled feature
+that could be automated.
+
+## 6. 3D Reconstruction  (Optional)
+
+A 3D geometry of a plant, at any stage of its growth,
+can be used to generate new images or a "digital twin"
+for visualization purposes.
+
+This is optional as machine learning tasks operate on
+raw data, and don't care whether it is interpretable as
+2D or 3D data. This is something humans make a distinction for.
+
+However, as humans and for aesthetic reasons, we may still
+wish to stop and rest at this "intermediate" stage.
+
+## 7. Plant Classification
+
+Finally, our end goal is to produce an automated classifier
+and model
+so that when a robot encounters a new plant crop growing in the
+world, or a new crop field, it runs its model,
+or sends the model back by wifi
+to a server, and it can classify the species.
+
+This is useful pedagogically because we've created a new
+training set that can be cleaned up and published for
+future computer science students.
