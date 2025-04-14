@@ -47,5 +47,7 @@ def find_text_in_image(image_path):
     print(annotations)
     return annotations
 
-save_frame_camera(1, "UDGR/images", "frame", ext="jpg", delay=1, window_name='frame')
-find_text_in_image("UDGR/images/frame_0.jpg")
+# save_frame_camera(1, "images", "frame", ext="jpg", delay=1, window_name='frame')
+result = find_text_in_image("images/ocr-screenshot.png")
+
+print(result)
