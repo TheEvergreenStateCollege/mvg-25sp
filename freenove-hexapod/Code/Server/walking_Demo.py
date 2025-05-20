@@ -27,3 +27,10 @@ c.relax(True)
 print("Relaxing servos")
 time.sleep(1)  # Wait for a second before ending the program
 print("End of program")
+
+# Test function to set servo angles
+# This function is not called in the main program but can be used for testing servo angles
+def test():
+    c.servo.set_servo_angle(15, 90)  # Hip
+    c.servo.set_servo_angle(14, 90)  # Elbow
+    c.servo.set_servo_angle(13, 90)  # Wrist
