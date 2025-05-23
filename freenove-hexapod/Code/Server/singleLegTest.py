@@ -3,6 +3,7 @@ from control import Control
 from servo import Servo
 import time
 
+#Since I am calling Control class, it will auto recalibrate and then move the single leg
 c = Control()
 servo = Servo()
 
@@ -28,11 +29,13 @@ def test():
 	# Note: Right side legs angles(elbow and wrist) are reversed from the left side angles
 	# if (4,75,30,30) then (3,75,150,150)
 	
-	#for leg in range(1,7):  This was a for loop to move all the legs
-		move_leg(4,75,30,30)  # This is to move just one leg (leg,hip,elbow,wrist)   
+	#for leg in range(1,7):  #This was a for loop to move all the legs
+		#move_leg(leg,75,0,75)  # This is to move just one leg (leg,hip,elbow,wrist) 
+		move_leg(4, 75, 90,90) 
 		#print(f"Tried hip on {leg}")
-		print("Moved leg 4") #
+		print("Moved leg 4") 
 		time.sleep(2)
+		c.relax(True)
 		
 test()
 

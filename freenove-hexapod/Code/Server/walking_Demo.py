@@ -2,12 +2,11 @@ from control import Control
 import time
 
 
-
 c = Control() # Create an instance of the Control class
 
-Z = 35
-F = 70
-steps = 10
+Z = 20
+F = 90
+steps = 3
 
 #Move forward
 print("Moving forward")
