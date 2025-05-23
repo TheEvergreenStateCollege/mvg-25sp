@@ -13,7 +13,7 @@ print("Moving forward")
 for i in range(steps):
     data = ['CMD_MOVE', '1', '0', '35', '10', '0']  # command move, gait, x, y, speed, rotation
     c.run_gait(data, Z=Z, F=F)
-    time.sleep(0.1)  # Adjust the sleep time as needed
+    time.sleep(0.2)  # Adjust the sleep time as needed
 
 #Move backward
 print("Moving backward")

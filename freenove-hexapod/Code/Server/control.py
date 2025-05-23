@@ -11,14 +11,18 @@ from command import COMMAND as cmd
 from imu import IMU
 from servo import Servo
 
+# When the Control is initialized, it will set up the IMU and Servo classes, as well as other necessary components.
+# It will also initialize the leg positions and angles, and start a thread to monitor conditions.
+# The class provides methods to read and write data to text files, convert coordinates to angles, calibrate the legs,
+# set leg angles, check point validity, and transform coordinates.
 class Control:
     def __init__(self):
-        self.imu = IMU()
-        self.servo = Servo()
-        self.movement_flag = 0x01
-        self.relaxation_flag = False
-        self.pid_controller = Incremental_PID(0.500, 0.00, 0.0025)
-        self.servo_power_disable = OutputDevice(4)
+        self.imu = IMU()    # Initialize the IMU class
+        self.servo = Servo()    # Initialize the Servo class
+        self.movement_flag = 0x01 
+        self.relaxation_flag = False 
+        self.pid_controller = Incremental_PID(0.500, 0.00, 0.0025) # Initialize the PID controller
+        self.servo_power_disable = OutputDevice(4) # Initialize the servo power disable pin
         self.servo_power_disable.off()
         self.status_flag = 0x00
         self.timeout = 0
@@ -35,17 +39,26 @@ class Control:
         self.condition_thread = threading.Thread(target=self.condition_monitor)
         self.Thread_conditiona = threading.Condition()
 
+
+# The read_from_txt method reads data from a text file and returns it as a list of lists.
+# So it basically reads the data from a file and converts it into a format that can be used in the program.
     def read_from_txt(self, filename):
         with open(filename + ".txt", "r") as file:
             lines = file.readlines()
             data = [list(map(int, line.strip().split("\t"))) for line in lines]
         return data
 
+
+# The save_to_txt method saves data to a text file. So it takes the data and writes it to a file in a specific format. It is used 
+# to save the calibration leg positions to a file.
     def save_to_txt(self, data, filename):
         with open(filename + '.txt', 'w') as file:
             for row in data:
                 file.write('\t'.join(map(str, row)) + '\n')
 
+# The coordinate_to_angle method converts 3D coordinates to angles using inverse kinematics.
+# So it basically takes the x, y, and z coordinates of a point and calculates the angles needed to reach that point.
+# The angles are returned in degrees. It is used to calculate the angles for the legs based on their positions.
     def coordinate_to_angle(self, x, y, z, l1=33, l2=90, l3=110):
         a = math.pi / 2 - math.atan2(z, y)
         x_3 = 0
@@ -58,7 +71,10 @@ class Control:
         b = math.asin(round(w, 2)) - math.acos(round(v, 2))
         c = math.pi - math.acos(round(u, 2))
         return round(math.degrees(a)), round(math.degrees(b)), round(math.degrees(c))
+    
 
+# The angle_to_coordinate method converts angles to 3D coordinates using forward kinematics. It is used for calculating the
+# coordinates of the legs based on their angles. The angles are given in degrees, and the method returns the x, y, and z coordinates.
     def angle_to_coordinate(self, a, b, c, l1=33, l2=90, l3=110):
         a = math.pi / 180 * a
         b = math.pi / 180 * b
@@ -67,7 +83,10 @@ class Control:
         y = round(l3 * math.sin(a) * math.cos(b + c) + l2 * math.sin(a) * math.cos(b) + l1 * math.sin(a))
         z = round(l3 * math.cos(a) * math.cos(b + c) + l2 * math.cos(a) * math.cos(b) + l1 * math.cos(a))
         return x, y, z
+    
 
+# The calibrate method calibrates the leg positions and angles. It sets the initial positions and angles of the legs based on the
+# calibration leg positions. It calculates the angles needed to reach the calibration positions and stores them in the calibration_angles list.
     def calibrate(self):
         self.leg_positions = [[140, 0, 0], [140, 0, 0], [140, 0, 0], [140, 0, 0], [140, 0, 0], [140, 0, 0]]
         for i in range(6):
@@ -81,6 +100,9 @@ class Control:
             self.calibration_angles[i][1] = self.calibration_angles[i][1] - self.current_angles[i][1]
             self.calibration_angles[i][2] = self.calibration_angles[i][2] - self.current_angles[i][2]
 
+
+# The set_leg_angles method sets the angles of the legs based on their positions and the calibration angles. It checks if the
+# coordinates are valid and then calculates the angles for each leg. The angles are set using the servo class.
     def set_leg_angles(self):
         if self.check_point_validity():
             for i in range(6):
@@ -260,6 +282,8 @@ class Control:
     def map_value(self, value, from_low, from_high, to_low, to_high):
         return (to_high - to_low) * (value - from_low) / (from_high - from_low) + to_low
 
+# The move_position method moves the body to a new position based on the x, y, and z coordinates.
+# It updates the body points and calculates the new angles for the legs. The method uses a deep copy of the body points to avoid modifying the original data.
     def move_position(self, x, y, z):
         points = copy.deepcopy(self.body_points)
         for i in range(6):
@@ -271,6 +295,8 @@ class Control:
         self.transform_coordinates(points)
         self.set_leg_angles()
 
+# The calculate_posture_balance method calculates the foot positions based on the roll, pitch, and yaw angles.
+# It uses rotation matrices to transform the coordinates of the foot points and returns the new positions.
     def calculate_posture_balance(self, roll, pitch, yaw):
         position = np.mat([0.0, 0.0, self.body_height]).T
         rpy = np.array([roll, pitch, yaw]) * math.pi / 180
@@ -306,6 +332,8 @@ class Control:
             foot_positions[i][2] = ab[2, i]
         return foot_positions
 
+# The imu6050 method is used to read data from the IMU sensor and adjust the leg angles accordingly.
+# It uses a PID controller to calculate the roll and pitch angles and then transforms the coordinates of the legs.
     def imu6050(self):
         old_roll = 0
         old_pitch = 0
@@ -325,6 +353,13 @@ class Control:
             points = self.calculate_posture_balance(roll, pitch, 0)
             self.transform_coordinates(points)
             self.set_leg_angles()
+
+# The run_gait method executes the gait based on the provided data. It takes the gait type, x and y coordinates, speed, and rotation angle.
+# It calculates the new positions of the legs based on the gait type and updates the leg angles accordingly.
+# The gait type can be "1" for tripod or "2" for ripple. The method uses trigonometric functions to calculate the new positions.
+
+# Gait 1 = Tripod gait: The legs move in a triangular pattern, with three legs moving at a time.
+# Gait 2 = Ripple gait: The legs move in a wave-like pattern, with all legs moving in a coordinated manner.
 
     def run_gait(self, data, Z=40, F=64):  # Example: data=['CMD_MOVE', '1', '0', '25', '10', '0']
         gait = data[1]
