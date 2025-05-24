@@ -9,9 +9,11 @@ F = 90
 steps = 3
 
 #Move forward
+#data = ['CMD_MOVE', '1', '0', '35', '10', '0']  # [command move, gait, x, y, speed, rotation]
+
 print("Moving forward")
 for i in range(steps):
-    data = ['CMD_MOVE', '1', '0', '35', '10', '0']  # command move, gait, x, y, speed, rotation
+    data = ['CMD_MOVE', '1', '0', '35', '10', '0']
     c.run_gait(data, Z=Z, F=F)
     time.sleep(0.2)  # Adjust the sleep time as needed
 

@@ -360,26 +360,29 @@ class Control:
 
 # Gait 1 = Tripod gait: The legs move in a triangular pattern, with three legs moving at a time.
 # Gait 2 = Ripple gait: The legs move in a wave-like pattern, with all legs moving in a coordinated manner.
+#data = ['CMD_MOVE', '1', '0', '35', '10', '0']  # [command move, gait, x, y, speed, rotation]
 
-    def run_gait(self, data, Z=40, F=64):  # Example: data=['CMD_MOVE', '1', '0', '25', '10', '0']
+    def run_gait(self, data, Z=40, F=64): 
         gait = data[1]
         x = self.restrict_value(int(data[2]), -35, 35)
         y = self.restrict_value(int(data[3]), -35, 35)
         if gait == "1":
-            F = round(self.map_value(int(data[4]), 2, 10, 126, 22))
+            F = round(self.map_value(int(data[4]), 2, 10, 126, 22))  # Gait 1 speed mapping
         else:
-            F = round(self.map_value(int(data[4]), 2, 10, 171, 45))
+            F = round(self.map_value(int(data[4]), 2, 10, 171, 45))  # Gait 2 speed mapping
         angle = int(data[5])
-        z = Z / F
+        z = Z / F  # Z is the height of the legs
         delay = 0.01
-        points = copy.deepcopy(self.body_points)
-        xy = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+        points = copy.deepcopy(self.body_points) # Initialize points with body points
+        xy = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]] 
         for i in range(6):
             xy[i][0] = ((points[i][0] * math.cos(angle / 180 * math.pi) + points[i][1] * math.sin(angle / 180 * math.pi) - points[i][0]) + x) / F
             xy[i][1] = ((-points[i][0] * math.sin(angle / 180 * math.pi) + points[i][1] * math.cos(angle / 180 * math.pi) - points[i][1]) + y) / F
         if x == 0 and y == 0 and angle == 0:
             self.transform_coordinates(points)
             self.set_leg_angles()
+            
+        # Gait 1 = Tripod gait
         elif gait == "1":
             for j in range(F):
                 for i in range(3):
@@ -418,6 +421,8 @@ class Control:
                 self.transform_coordinates(points)
                 self.set_leg_angles()
                 time.sleep(delay)
+       
+        # Gait 2 = Ripple gait
         elif gait == "2":
             number = [5, 2, 1, 0, 3, 4]
             for i in range(6):
