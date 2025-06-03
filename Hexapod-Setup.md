@@ -1,4 +1,4 @@
-# Hexapod Robot Hardware Setup
+# Hexapod Robot Setup
 
 The Hexapod Robot we use in Multiple View Geometry has a standard setup used to prepare it each time
 for programming in this class. It can take up to 30 minutes at the beginning of each class, and up to
@@ -6,7 +6,48 @@ for programming in this class. It can take up to 30 minutes at the beginning of 
 
 Common abbreviations and terms we include in the glossary.
 
-## Setup Procedure
+## Software Setup Procedure
+
+Modern `pip3` wants to be installed in a virtual environment.
+
+### On Mac OS
+
+```
+brew install pyenv
+```
+
+Edit your [`zsh` startup files as described here](https://github.com/pyenv/pyenv-virtualenv/issues/387)
+
+`~.zprofile`
+
+```
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init --path)"
+```
+
+`~/.zshrc`
+
+```
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+```
+
+Then open a new terminal and you can install the needed python files in
+
+```
+pyenv install 3.13 # install version 3.13 of python, regardless of what system python is
+pyenv virtualenv 3.13 robot # we choose the environment name robot, but you can choose anything
+pyenv activate robot
+```
+
+Look for the prompt change to show that you are in a python virtual environment.
+
+```
+pip3 install ... # all the dependencies in the Freenove manual
+```
+
+## Hardware Setup Procedure
 
 The robot can be set up either in *autonomous* mode, meaning wireless and battery power setup in the field, or
 in *bench* mode.
